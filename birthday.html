@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Bell!</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&display=swap');
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --gold: #C9A96E;
+            --gold-light: #D4B980;
+            --champagne: #F5E6D3;
+            --cream: #FFF8F0;
+            --soft-pink: #F0D4D4;
+            --dark-deep: #0D0D0D;
+            --text-light: #E8E0D6;
+            --text-muted: #A09688;
+            --glass-bg: rgba(30, 30, 30, 0.6);
+            --glass-border: rgba(201, 169, 110, 0.15);
+        }
+
+        html { scroll-behavior: smooth; overflow-x: hidden; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-deep);
+            color: var(--text-light);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--dark-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+
+        #particles-canvas {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0; pointer-events: none;
+        }
+
+        .landing {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; z-index: 1000;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            background: var(--dark-deep); cursor: pointer;
+            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1),
+                        transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .landing.hidden { opacity: 0; transform: scale(1.05); pointer-events: none; }
+        .landing-bg-gradient {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background:
+                radial-gradient(ellipse at 30% 20%, rgba(201,169,110,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(240,212,212,0.05) 0%, transparent 50%);
+            animation: gradientShift 12s ease-in-out infinite;
+        }
+        @keyframes gradientShift {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+        .landing-content { position: relative; z-index: 2; text-align: center; padding: 2rem; }
+        .envelope-icon {
+            width: 70px; height: 70px; margin: 0 auto 2.5rem;
+            opacity: 0; animation: fadeSlideUp 1s ease 0.3s forwards; position: relative;
+        }
+        .envelope-icon svg {
+            width: 100%; height: 100%; stroke: var(--gold); fill: none; stroke-width: 1;
+            filter: drop-shadow(0 0 15px rgba(201,169,110,0.3));
+        }
+        .envelope-icon::after {
+            content: ''; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); width: 120%; height: 120%; border-radius: 50%;
+            background: radial-gradient(circle, rgba(201,169,110,0.08) 0%, transparent 70%);
+            animation: envelopePulse 3s ease-in-out infinite;
+        }
+        @keyframes envelopePulse {
+            0%, 100% { transform: translate(-50%,-50%) scale(0.9); opacity: 0.5; }
+            50% { transform: translate(-50%,-50%) scale(1.2); opacity: 1; }
+        }
+        .landing-tap {
+            font-family: 'Inter', sans-serif; font-weight: 300;
+            font-size: 0.75rem; letter-spacing: 4px;
+            text-transform: uppercase; color: var(--gold);
+            opacity: 0; animation: fadeSlideUp 1s ease 0.7s forwards, tapPulse 2.5s ease-in-out 1.7s infinite;
+        }
+        @keyframes tapPulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+        .main-content { opacity: 0; visibility: hidden; transition: opacity 1s ease 0.5s; }
+        .main-content.visible { opacity: 1; visibility: visible; }
+
+        .birthday-hero {
+            position: relative; min-height: 100vh;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center; padding: 4rem 2rem; overflow: hidden;
+        }
+        .hero-glow {
+            position: absolute; width: 500px; height: 500px; border-radius: 50%;
+            filter: blur(120px); opacity: 0; animation: heroGlowIn 2s ease 0.5s forwards;
+        }
+        .hero-glow-1 { top: 20%; left: 30%; background: rgba(201,169,110,0.12); }
+        .hero-glow-2 { bottom: 20%; right: 30%; background: rgba(240,212,212,0.08); }
+        @keyframes heroGlowIn { to { opacity: 1; } }
+        .hero-content { position: relative; z-index: 2; }
+        .hero-date {
+            font-family: 'Inter', sans-serif; font-weight: 300; font-size: 0.85rem;
+            letter-spacing: 5px; text-transform: uppercase; color: var(--gold);
+            margin-bottom: 2rem; opacity: 0; transform: translateY(20px);
+        }
+        .hero-date.animate { animation: fadeSlideUp 1s ease forwards; }
+        .hero-line {
+            width: 1px; height: 60px;
+            background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+            margin: 0 auto 2rem; opacity: 0; transform: scaleY(0);
+        }
+        .hero-line.animate { animation: lineGrow 1s ease 0.3s forwards; }
+        @keyframes lineGrow { to { opacity: 1; transform: scaleY(1); } }
+        .hero-name {
+            font-family: 'Playfair Display', serif; font-size: clamp(3rem, 10vw, 7rem);
+            font-weight: 400; line-height: 1.1; color: var(--cream);
+            margin-bottom: 0.5rem; opacity: 0; transform: translateY(30px);
+        }
+        .hero-name.animate { animation: fadeSlideUp 1.2s ease 0.5s forwards; }
+        .hero-name .name-highlight {
+            display: block;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light), var(--champagne));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .hero-sparkle-line {
+            display: flex; align-items: center; justify-content: center;
+            gap: 1rem; margin: 1.5rem 0; opacity: 0;
+        }
+        .hero-sparkle-line.animate { animation: fadeSlideUp 1s ease 0.8s forwards; }
+        .sparkle-dot { width: 4px; height: 4px; background: var(--gold); border-radius: 50%; }
+        .sparkle-line-inner { width: 80px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+        .floating-element { position: absolute; opacity: 0.15; pointer-events: none; }
+        .float-ring { width: 200px; height: 200px; border: 1px solid var(--gold); border-radius: 50%; animation: floatSlow 20s ease-in-out infinite; }
+        .float-ring-1 { top: 10%; right: 5%; width: 150px; height: 150px; }
+        .float-ring-2 { bottom: 15%; left: 5%; animation-delay: -10s; }
+        .float-diamond { width: 20px; height: 20px; border: 1px solid var(--gold); transform: rotate(45deg); animation: floatSlow 15s ease-in-out infinite; }
+        .float-diamond-1 { top: 25%; left: 15%; animation-delay: -5s; }
+        .float-diamond-2 { bottom: 30%; right: 15%; animation-delay: -8s; }
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-20px) rotate(5deg); }
+            75% { transform: translateY(15px) rotate(-3deg); }
+        }
+
+        .letter-section { position: relative; padding: 8rem 2rem; display: flex; justify-content: center; }
+        .letter-container { max-width: 700px; width: 100%; }
+        .letter-header { text-align: center; margin-bottom: 3rem; }
+        .letter-icon { width: 50px; height: 50px; margin: 0 auto 1.5rem; opacity: 0.6; }
+        .letter-icon svg { width: 100%; height: 100%; stroke: var(--gold); fill: none; stroke-width: 1; }
+        .letter-section-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 400; color: var(--cream); margin-bottom: 0.5rem; }
+        .letter-card {
+            background: var(--glass-bg); backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border); border-radius: 2px;
+            padding: 3rem; position: relative;
+            opacity: 0; transform: translateY(40px);
+            transition: opacity 1s ease, transform 1s ease;
+        }
+        .letter-card.animate { opacity: 1; transform: translateY(0); }
+        .letter-card::before { content: ''; position: absolute; top: -1px; left: 50%; transform: translateX(-50%); width: 60px; height: 1px; background: var(--gold); }
+        .letter-greeting { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 400; font-style: italic; color: var(--gold-light); margin-bottom: 2rem; }
+        .letter-body p { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 300; line-height: 1.9; color: var(--text-light); margin-bottom: 1.5rem; opacity: 0.9; }
+        .letter-body p:last-child { margin-bottom: 0; }
+        .letter-closing { margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid rgba(201,169,110,0.1); }
+        .letter-closing p { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 400; font-style: italic; color: var(--gold-light); line-height: 1.8; }
+        .letter-signature { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-style: italic; color: var(--cream); margin-top: 1rem; }
+
+        .gallery-section { position: relative; padding: 6rem 2rem 4rem; overflow: hidden; }
+        .gallery-header { text-align: center; margin-bottom: 2rem; }
+        .gallery-title { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 400; color: var(--cream); margin-bottom: 0.8rem; opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease; }
+        .gallery-title.animate { opacity: 1; transform: translateY(0); }
+
+        .reveal-btn-wrap { display: flex; justify-content: center; margin-bottom: 3rem; }
+        .gallery-reveal-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 28px; font-family: 'Inter', sans-serif;
+            font-weight: 300; font-size: 0.7rem; letter-spacing: 2px;
+            text-transform: uppercase; color: var(--gold);
+            background: transparent; border: 1px solid rgba(201,169,110,0.25);
+            border-radius: 30px; cursor: pointer;
+            opacity: 0; transform: translateY(15px); transition: all 0.5s ease;
+        }
+        .gallery-reveal-btn.animate { opacity: 1; transform: translateY(0); }
+        .gallery-reveal-btn:hover { background: rgba(201,169,110,0.06); border-color: var(--gold); box-shadow: 0 0 25px rgba(201,169,110,0.1); }
+        .gallery-reveal-btn.hidden { opacity: 0 !important; pointer-events: none; height: 0; margin: 0; padding: 0; border: none; overflow: hidden; }
+        .reveal-btn-icon { width: 14px; height: 14px; transition: transform 0.4s ease; }
+        .gallery-reveal-btn:hover .reveal-btn-icon { transform: rotate(90deg); }
+        .reveal-btn-icon svg { width: 100%; height: 100%; stroke: var(--gold); fill: none; stroke-width: 2; }
+
+        .circle-cluster-wrap {
+            display: flex; justify-content: center; align-items: center;
+            width: 100%; padding: 2rem 0;
+        }
+        .circle-cluster {
+            position: relative;
+            width: 750px; height: 750px;
+            margin: 0 auto;
+        }
+        .circle-item {
+            position: absolute; border-radius: 50%; overflow: hidden;
+            cursor: pointer; border: 2px solid rgba(201,169,110,0.3);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            opacity: 0; z-index: 1; will-change: transform;
+        }
+        .circle-item img {
+            width: 100%; height: 100%; object-fit: cover; display: block;
+            transition: transform 0.6s ease, filter 0.4s ease;
+            filter: brightness(0.85) saturate(0.9);
+        }
+        .circle-item:hover {
+            z-index: 20 !important; border-color: var(--gold) !important;
+            box-shadow: 0 12px 45px rgba(201,169,110,0.2), 0 15px 50px rgba(0,0,0,0.5) !important;
+        }
+        .circle-item:hover img { transform: scale(1.15); filter: brightness(1) saturate(1.1); }
+        .circle-item::after {
+            content: ''; position: absolute; inset: 0; border-radius: 50%;
+            background: radial-gradient(circle, rgba(201,169,110,0.12) 0%, transparent 70%);
+            opacity: 0; transition: opacity 0.4s ease; pointer-events: none;
+        }
+        .circle-item:hover::after { opacity: 1; }
+
+        /* ===== VIDEO ===== */
+        .video-section { position: relative; padding: 4rem 2rem 6rem; }
+        .video-header { text-align: center; margin-bottom: 2.5rem; }
+        .video-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem; font-weight: 400; font-style: italic;
+            color: var(--cream); margin-bottom: 0.8rem;
+        }
+        .video-title-line {
+            width: 50px; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            margin: 0 auto;
+        }
+        .video-container { max-width: 800px; margin: 0 auto; }
+        .video-wrap {
+            position: relative; width: 100%; aspect-ratio: 16 / 9;
+            border-radius: 4px; overflow: hidden;
+            border: 1px solid rgba(201,169,110,0.2);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.5); background: #000;
+        }
+        .video-wrap video { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        /* ===== 3 SMALL PHOTOS UNDER HERO ===== */
+      .mini-photos-section {
+    position: relative;
+    padding: 0 2rem 5rem;
+    margin-top: -14rem;  /* ← make this more negative to move photos up (was -4rem) */
+}
+
+.mini-photos-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;           /* ← increase gap for more spacing (was 20px) */
+}
+
+.mini-photo {
+    width: 150px;        /* ← increase size of left & right photos (was 130px) */
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid rgba(201,169,110,0.25);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+    opacity: 0;
+    transform: translateY(20px) scale(0.8);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.mini-photo.animate {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.mini-photo:nth-child(1) { transition-delay: 0.2s; }
+.mini-photo:nth-child(2) {
+    transition-delay: 0.4s;
+    width: 170px;        /* ← increase size of the middle photo (was 150px) */
+    height: 170px;
+}
+.mini-photo:nth-child(3) { transition-delay: 0.6s; }
+        .mini-photo img {
+            width: 100%; height: 100%;
+            object-fit: cover; display: block;
+            filter: brightness(0.85) saturate(0.9);
+            transition: transform 0.5s ease, filter 0.4s ease;
+        }
+        .mini-photo:hover img {
+            transform: scale(1.1);
+            filter: brightness(1) saturate(1);
+        }
+        .mini-photo:hover {
+            border-color: var(--gold);
+            box-shadow: 0 8px 30px rgba(201,169,110,0.2);
+        }
+
+        /* SCROLL REVEAL */
+        .scroll-reveal {
+            opacity: 0; transform: translateY(40px);
+            transition: opacity 0.9s cubic-bezier(0.25,0.46,0.45,0.94),
+                        transform 0.9s cubic-bezier(0.25,0.46,0.45,0.94);
+        }
+        .scroll-reveal.visible { opacity: 1; transform: translateY(0); }
+
+        .lightbox {
+            position: fixed; inset: 0; z-index: 2000;
+            background: rgba(0,0,0,0.96);
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease; cursor: zoom-out;
+        }
+        .lightbox.active { opacity: 1; visibility: visible; }
+        .lightbox img {
+            max-width: 90vw; max-height: 85vh; object-fit: contain; border-radius: 8px;
+            transform: scale(0.9); transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+        }
+        .lightbox.active img { transform: scale(1); }
+        .lightbox-close {
+            position: absolute; top: 2rem; right: 2rem; width: 40px; height: 40px;
+            cursor: pointer; opacity: 0.5; transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .lightbox-close:hover { opacity: 1; transform: rotate(90deg); }
+        .lightbox-close svg { width: 100%; height: 100%; stroke: white; fill: none; stroke-width: 1.5; }
+        .lightbox-nav {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            width: 50px; height: 50px; cursor: pointer; opacity: 0.4;
+            transition: opacity 0.3s ease; background: none; border: none; padding: 10px;
+        }
+        .lightbox-nav:hover { opacity: 1; }
+        .lightbox-nav svg { width: 100%; height: 100%; stroke: white; fill: none; stroke-width: 1.5; }
+        .lightbox-prev { left: 1.5rem; }
+        .lightbox-next { right: 1.5rem; }
+        .lightbox-counter {
+            position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+            font-family: 'Inter', sans-serif; font-weight: 300;
+            font-size: 0.75rem; letter-spacing: 3px; color: rgba(255,255,255,0.4);
+        }
+
+        .music-control {
+            position: fixed; bottom: 2rem; right: 2rem; z-index: 500;
+            width: 44px; height: 44px; border-radius: 50%;
+            background: var(--glass-bg); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s ease; opacity: 0; transform: translateY(10px);
+        }
+        .music-control.visible { opacity: 1; transform: translateY(0); }
+        .music-control:hover { background: rgba(201,169,110,0.15); border-color: rgba(201,169,110,0.3); }
+        .music-bars { display: flex; align-items: flex-end; gap: 2px; height: 16px; }
+        .music-bar { width: 2px; background: var(--gold); border-radius: 1px; }
+        .music-bar:nth-child(1) { height: 6px; }
+        .music-bar:nth-child(2) { height: 12px; }
+        .music-bar:nth-child(3) { height: 8px; }
+        .music-bar:nth-child(4) { height: 14px; }
+        .music-control.playing .music-bar { animation: musicAnim 0.8s ease-in-out infinite alternate; }
+        .music-control.playing .music-bar:nth-child(1) { animation-delay: 0s; }
+        .music-control.playing .music-bar:nth-child(2) { animation-delay: 0.2s; }
+        .music-control.playing .music-bar:nth-child(3) { animation-delay: 0.4s; }
+        .music-control.playing .music-bar:nth-child(4) { animation-delay: 0.1s; }
+        @keyframes musicAnim { 0% { height: 4px; } 100% { height: 16px; } }
+        .music-control:not(.playing) .music-bar { height: 4px !important; }
+
+        .section-divider { display: flex; align-items: center; justify-content: center; gap: 1.5rem; padding: 2rem 0; }
+        .divider-line { width: 60px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); opacity: 0.3; }
+        .divider-diamond { width: 8px; height: 8px; border: 1px solid var(--gold); transform: rotate(45deg); opacity: 0.4; }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 800px) {
+            .circle-cluster { width: 95vw; height: 95vw; max-width: 600px; max-height: 600px; }
+            .letter-card { padding: 2rem 1.5rem; }
+            .birthday-hero { padding: 3rem 1.5rem; }
+            .music-control { bottom: 1rem; right: 1rem; width: 38px; height: 38px; }
+            .mini-photo { width: 80px; height: 80px; }
+            .mini-photo:nth-child(2) { width: 100px; height: 100px; }
+        }
+        @media (max-width: 480px) {
+            .circle-cluster { width: 95vw; height: 95vw; max-width: 380px; max-height: 380px; }
+            .hero-name { font-size: clamp(2.5rem, 12vw, 4rem); }
+            .letter-card { padding: 1.5rem 1.2rem; }
+            .letter-body p { font-size: 1.05rem; }
+            .mini-photo { width: 70px; height: 70px; }
+            .mini-photo:nth-child(2) { width: 85px; height: 85px; }
+        }
+
+        body.no-scroll { overflow: hidden; }
+    </style>
+</head>
+<body class="no-scroll">
+
+    <canvas id="particles-canvas"></canvas>
+
+    <section class="landing" id="landing">
+        <div class="landing-bg-gradient"></div>
+        <div class="landing-content">
+            <div class="envelope-icon">
+                <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke-linecap="round" stroke-linejoin="round"/><polyline points="22,6 12,13 2,6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <p class="landing-tap">pasti kamu ngira aku lupa ya?</p>
+        </div>
+    </section>
+
+    <main class="main-content" id="mainContent">
+
+        <!-- HERO -->
+        <section class="birthday-hero">
+            <div class="hero-glow hero-glow-1"></div>
+            <div class="hero-glow hero-glow-2"></div>
+            <div class="floating-element float-ring float-ring-1"></div>
+            <div class="floating-element float-ring float-ring-2"></div>
+            <div class="floating-element float-diamond float-diamond-1"></div>
+            <div class="floating-element float-diamond float-diamond-2"></div>
+            <div class="hero-content">
+                <p class="hero-date" id="heroDate">February 25th, 2026</p>
+                <div class="hero-line" id="heroLine"></div>
+                <h1 class="hero-name" id="heroName">
+                    Happy Birthday
+                    <span class="name-highlight">Salsabila Saskyafeb</span>
+                </h1>
+                <div class="hero-sparkle-line" id="heroSparkle">
+                    <span class="sparkle-dot"></span>
+                    <span class="sparkle-line-inner"></span>
+                    <span class="sparkle-dot"></span>
+                    <span class="sparkle-line-inner"></span>
+                    <span class="sparkle-dot"></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3 SMALL PHOTOS BELOW HERO -->
+        <section class="mini-photos-section">
+            <div class="mini-photos-row">
+                <!-- Tukar src dengan gambar muka Bell -->
+                <div class="mini-photo" id="miniPhoto1">
+                    <img src="/img/cv.png" alt="Bell 1">
+                </div>
+                <div class="mini-photo" id="miniPhoto2">
+                    <img src="/img/vcp.png" alt="Bell 2">
+                </div>
+                <div class="mini-photo" id="miniPhoto3">
+                    <img src="/img/cf.png" alt="Bell 3">
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider scroll-reveal"><span class="divider-line"></span><span class="divider-diamond"></span><span class="divider-line"></span></div>
+
+        <!-- LETTER -->
+        <section class="letter-section">
+            <div class="letter-container">
+                <div class="letter-header scroll-reveal">
+                    <div class="letter-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke-linecap="round" stroke-linejoin="round"/><polyline points="22,6 12,13 2,6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                    <h2 class="letter-section-title">A Letter For You</h2>
+                </div>
+                <div class="letter-card scroll-reveal" id="letterCard">
+                    <p class="letter-greeting">My Dearest Bell,</p>
+                    <div class="letter-body">
+                        <p>May your birthday be filled with happiness, laughter, and positive energy from the moment you wake up until the day ends. Hope you get to spend it doing things you enjoy, surrounded by people who make you feel comfortable and appreciated.</p>
+
+<p>As you turn 26, may this new year bring you success in everything you work hard for. I hope your goals become clearer, your efforts pay off, and your journey move in the direction you want. I hope you achieve more than you expect and feel proud of yourself along the way.</p>
+
+<p>May this year also bring good health, peace of mind, and stability in your life and i hope every challenges you face turn into lessons, and may every step you take bring you closer to your dreams. Keep growing, keep improving, and keep believing in yourself.</p>
+
+<p>Enjoy your special day. Take time to celebrate, relax, and appreciate how far you’ve come. You deserve a great birthday and an even better year ahead.</p>
+
+<p>I also want to say thank you for being in my life. I’m genuinely grateful for your presence, your energy, and the impact you bring, even in simple ways. Having you around means more than you probably realize, and I truly appreciate the moments and memories we share.</p>
+                    </div>
+                    <div class="letter-closing">
+                        <p>~ Ren ,</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider scroll-reveal"><span class="divider-line"></span><span class="divider-diamond"></span><span class="divider-line"></span></div>
+
+        <!-- GALLERY -->
+        <section class="gallery-section" id="gallerySection">
+            <div class="gallery-header">
+                <h2 class="gallery-title scroll-reveal" id="galleryTitle">Our Memorable Moments</h2>
+            </div>
+            <div class="reveal-btn-wrap">
+                <button class="gallery-reveal-btn scroll-reveal" id="galleryRevealBtn">
+                    <span class="reveal-btn-icon"><svg viewBox="0 0 24 24"><path d="M12 2L12 22M2 12L22 12" stroke-linecap="round"/></svg></span>
+                    Reveal
+                </button>
+            </div>
+            <div class="circle-cluster-wrap">
+                <div class="circle-cluster" id="circleCluster">
+                    <div class="circle-item" data-index="0"><img src="/img/zz.png" alt="1"></div>
+                    <div class="circle-item" data-index="1"><img src="/img/z.png" alt="2"></div>
+                    <div class="circle-item" data-index="2"><img src="/img/zzz.png" alt="3"></div>
+                    <div class="circle-item" data-index="3"><img src="/img/cas.jpg" alt="4"></div>
+                    <div class="circle-item" data-index="4"><img src="/img/oi.png" alt="5"></div>
+                    <div class="circle-item" data-index="5"><img src="/img/nm.png" alt="6"></div>
+                    <div class="circle-item" data-index="6"><img src="/img/yu.jpg" alt="7"></div>
+                    <div class="circle-item" data-index="7"><img src="/img/lst.png" alt="8"></div>
+                    <div class="circle-item" data-index="8"><img src="/img/ls2.png" alt="9"></div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider scroll-reveal"><span class="divider-line"></span><span class="divider-diamond"></span><span class="divider-line"></span></div>
+
+        <!-- VIDEO -->
+        <section class="video-section">
+            <div class="video-header scroll-reveal">
+                <h2 class="video-title">Something that I Will Never Forget</h2>
+                <h2 class="video-title">lucu soalnya wkwkwk</h2>
+                <div class="video-title-line"></div>
+            </div>
+            <div class="video-container scroll-reveal">
+                <div class="video-wrap">
+                    <!-- Simpan video dalam folder yang sama, tukar src -->
+                    <video controls playsinline preload="metadata">
+                        <source src="bell.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+        </section>
+
+        <div style="height: 6rem;"></div>
+
+    </main>
+
+    <!-- LIGHTBOX -->
+    <div class="lightbox" id="lightbox">
+        <div class="lightbox-close" id="lightboxClose"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+        <button class="lightbox-nav lightbox-prev" id="lightboxPrev"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <img id="lightboxImg" src="" alt="Gallery Image">
+        <button class="lightbox-nav lightbox-next" id="lightboxNext"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
+        <div class="lightbox-counter" id="lightboxCounter">1 / 9</div>
+    </div>
+
+    <!-- MUSIC -->
+    <div class="music-control" id="musicControl">
+        <div class="music-bars"><span class="music-bar"></span><span class="music-bar"></span><span class="music-bar"></span><span class="music-bar"></span></div>
+    </div>
+
+    <audio id="bgMusic" loop preload="auto">
+        <source src="sempurna (guitar).mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const landing = document.getElementById('landing');
+        const mainContent = document.getElementById('mainContent');
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightboxImg');
+        const lightboxClose = document.getElementById('lightboxClose');
+        const lightboxPrev = document.getElementById('lightboxPrev');
+        const lightboxNext = document.getElementById('lightboxNext');
+        const lightboxCounter = document.getElementById('lightboxCounter');
+        const galleryRevealBtn = document.getElementById('galleryRevealBtn');
+        const circleCluster = document.getElementById('circleCluster');
+        const musicControl = document.getElementById('musicControl');
+        const bgMusic = document.getElementById('bgMusic');
+
+        let currentLightboxIndex = 0;
+        let galleryImages = [];
+        let isPlaying = false;
+
+        // PARTICLES
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.sx = (Math.random() - 0.5) * 0.3; this.sy = (Math.random() - 0.5) * 0.3;
+                this.o = Math.random() * 0.4 + 0.1;
+                this.fd = Math.random() > 0.5 ? 1 : -1; this.fs = Math.random() * 0.003 + 0.001;
+                this.h = Math.random() > 0.7 ? 35 : 30;
+                this.sat = Math.random() * 20 + 30; this.l = Math.random() * 20 + 60;
+            }
+            update() {
+                this.x += this.sx; this.y += this.sy;
+                this.o += this.fd * this.fs;
+                if (this.o <= 0.05 || this.o >= 0.5) this.fd *= -1;
+                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
+            }
+            draw() {
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `hsla(${this.h},${this.sat}%,${this.l}%,${this.o})`; ctx.fill();
+            }
+        }
+        let particles = [];
+        function initP() {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight; particles = [];
+            for (let i = 0; i < Math.min(80, Math.floor(window.innerWidth / 15)); i++) particles.push(new Particle());
+        }
+        function animP() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); }); requestAnimationFrame(animP);
+        }
+        window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+        initP(); animP();
+
+        // LAYOUT CIRCLES
+        const SC = { centerRatio: 0.38, outerRatio: 0.28, radiusRatio: 0.37 };
+        function layoutCircles() {
+            const c = circleCluster, W = c.offsetWidth, H = c.offsetHeight, cx = W/2, cy = H/2;
+            const items = c.querySelectorAll('.circle-item'), oc = items.length - 1;
+            const r = Math.min(W,H)*SC.radiusRatio, cs = Math.min(W,H)*SC.centerRatio, os = Math.min(W,H)*SC.outerRatio;
+            items.forEach((item, i) => {
+                if (i === 0) {
+                    item.style.width=cs+'px'; item.style.height=cs+'px';
+                    item.style.left=(cx-cs/2)+'px'; item.style.top=(cy-cs/2)+'px'; item.style.zIndex='5';
+                } else {
+                    const a = ((i-1)/oc)*Math.PI*2 - Math.PI/2;
+                    const x = cx+Math.cos(a)*r, y = cy+Math.sin(a)*r;
+                    item.style.width=os+'px'; item.style.height=os+'px';
+                    item.style.left=(x-os/2)+'px'; item.style.top=(y-os/2)+'px'; item.style.zIndex='2';
+                }
+            });
+        }
+
+        // SCROLL REVEAL
+        function setupSR() {
+            const obs = new IntersectionObserver((entries) => {
+                entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); e.target.classList.add('animate'); } });
+            }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+            document.querySelectorAll('.scroll-reveal').forEach(el => obs.observe(el));
+        }
+
+        // LANDING
+        landing.addEventListener('click', () => {
+            landing.classList.add('hidden');
+            document.body.classList.remove('no-scroll');
+            setTimeout(() => {
+                mainContent.classList.add('visible');
+                landing.style.display = 'none';
+                ['heroDate','heroLine','heroName','heroSparkle'].forEach(id => {
+                    const el = document.getElementById(id); if (el) el.classList.add('animate');
+                });
+                // Animate mini photos
+                setTimeout(() => {
+                    ['miniPhoto1','miniPhoto2','miniPhoto3'].forEach(id => {
+                        const el = document.getElementById(id); if (el) el.classList.add('animate');
+                    });
+                }, 800);
+                musicControl.classList.add('visible');
+                setTimeout(layoutCircles, 200);
+                setupSR();
+                bgMusic.play().then(() => { musicControl.classList.add('playing'); isPlaying = true; }).catch(() => {});
+            }, 600);
+        });
+
+        window.addEventListener('resize', layoutCircles);
+
+        // IMAGES
+        galleryImages = Array.from(circleCluster.querySelectorAll('.circle-item img')).map(img => img.src);
+
+        // REVEAL
+        let revealed = false;
+        galleryRevealBtn.addEventListener('click', () => {
+            if (revealed) return; revealed = true;
+            galleryRevealBtn.classList.add('hidden');
+            const items = circleCluster.querySelectorAll('.circle-item');
+            const W = circleCluster.offsetWidth, H = circleCluster.offsetHeight, cx = W/2, cy = H/2;
+
+            items.forEach(item => {
+                const fl = parseFloat(item.style.left), ft = parseFloat(item.style.top), fw = parseFloat(item.style.width);
+                item.dataset.fl = fl; item.dataset.ft = ft;
+                item.style.left = (cx-fw/2)+'px'; item.style.top = (cy-fw/2)+'px';
+                item.style.transform = 'scale(0)'; item.style.opacity = '0'; item.style.transition = 'none';
+            });
+            circleCluster.offsetHeight;
+
+            setTimeout(() => {
+                const item = items[0];
+                item.style.transition = 'all 0.8s cubic-bezier(0.34,1.56,0.64,1)';
+                item.style.left = item.dataset.fl+'px'; item.style.top = item.dataset.ft+'px';
+                item.style.transform = 'scale(1)'; item.style.opacity = '1';
+            }, 100);
+
+            for (let i = 1; i < items.length; i++) {
+                setTimeout(() => {
+                    const item = items[i];
+                    item.style.transition = 'all 0.9s cubic-bezier(0.34,1.56,0.64,1)';
+                    item.style.left = item.dataset.fl+'px'; item.style.top = item.dataset.ft+'px';
+                    item.style.transform = 'scale(1)'; item.style.opacity = '1';
+                }, 300 + (i-1)*200);
+            }
+
+            setTimeout(() => {
+                items.forEach(item => {
+                    item.style.transition = 'border-color 0.4s ease, box-shadow 0.4s ease, z-index 0s';
+                });
+            }, 300 + (items.length-2)*200 + 1200);
+        });
+
+        // LIGHTBOX
+        circleCluster.addEventListener('click', (e) => {
+            if (!revealed) return;
+            const item = e.target.closest('.circle-item');
+            if (item) openLB(parseInt(item.dataset.index));
+        });
+        function openLB(i) {
+            currentLightboxIndex = i; lightboxImg.src = galleryImages[i];
+            lightboxCounter.textContent = `${i+1} / ${galleryImages.length}`;
+            lightbox.classList.add('active'); document.body.style.overflow = 'hidden';
+        }
+        function closeLB() { lightbox.classList.remove('active'); document.body.style.overflow = ''; }
+        function navLB(d) {
+            currentLightboxIndex += d;
+            if (currentLightboxIndex < 0) currentLightboxIndex = galleryImages.length-1;
+            if (currentLightboxIndex >= galleryImages.length) currentLightboxIndex = 0;
+            lightboxImg.style.opacity = '0'; lightboxImg.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                lightboxImg.src = galleryImages[currentLightboxIndex];
+                lightboxCounter.textContent = `${currentLightboxIndex+1} / ${galleryImages.length}`;
+                lightboxImg.style.opacity = '1'; lightboxImg.style.transform = 'scale(1)';
+            }, 200);
+        }
+        lightboxClose.addEventListener('click', closeLB);
+        lightboxPrev.addEventListener('click', (e) => { e.stopPropagation(); navLB(-1); });
+        lightboxNext.addEventListener('click', (e) => { e.stopPropagation(); navLB(1); });
+        lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLB(); });
+        document.addEventListener('keydown', (e) => {
+            if (!lightbox.classList.contains('active')) return;
+            if (e.key === 'Escape') closeLB();
+            if (e.key === 'ArrowLeft') navLB(-1);
+            if (e.key === 'ArrowRight') navLB(1);
+        });
+        lightboxImg.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+
+        // MUSIC
+        musicControl.addEventListener('click', () => {
+            if (isPlaying) { bgMusic.pause(); musicControl.classList.remove('playing'); isPlaying = false; }
+            else { bgMusic.play().then(() => { musicControl.classList.add('playing'); isPlaying = true; }).catch(() => {}); }
+        });
+
+        // ===== VIDEO & MUSIC COORDINATION =====
+const video = document.querySelector('.video-wrap video');
+let musicPausedByVideo = false; // true if video paused the music
+
+if (video) {
+    video.addEventListener('play', () => {
+        // If music is playing when video starts, pause it and remember
+        if (!bgMusic.paused) {
+            musicPausedByVideo = true;
+            bgMusic.pause();
+            isPlaying = false;
+            musicControl.classList.remove('playing');
+        } else {
+            musicPausedByVideo = false;
+        }
+    });
+
+    video.addEventListener('pause', () => {
+        // When video is paused, resume music only if it was paused by video
+        if (musicPausedByVideo && bgMusic.paused) {
+            bgMusic.play().then(() => {
+                isPlaying = true;
+                musicControl.classList.add('playing');
+                musicPausedByVideo = false; // music is now playing normally
+            }).catch(() => {});
+        }
+    });
+
+    video.addEventListener('ended', () => {
+        // Same as pause: resume music if it was paused by video
+        if (musicPausedByVideo && bgMusic.paused) {
+            bgMusic.play().then(() => {
+                isPlaying = true;
+                musicControl.classList.add('playing');
+                musicPausedByVideo = false;
+            }).catch(() => {});
+        }
+    });
+}
+
+// Modify the music control click to reset the flag when user manually plays music
+const originalMusicHandler = musicControl.click; // optional, but we'll override
+musicControl.addEventListener('click', () => {
+    if (isPlaying) {
+        bgMusic.pause();
+        isPlaying = false;
+        musicControl.classList.remove('playing');
+        // If video is playing, user manually paused music – so video should not resume it
+        if (video && !video.paused) {
+            musicPausedByVideo = false;
+        }
+    } else {
+        bgMusic.play().then(() => {
+            isPlaying = true;
+            musicControl.classList.add('playing');
+            // User manually started music – video should not auto‑pause/resume it now
+            if (video && !video.paused) {
+                musicPausedByVideo = false;
+            }
+        }).catch(() => {});
+    }
+});
+
+        // PARALLAX
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                requestAnimationFrame(() => {
+                    const s = window.pageYOffset;
+                    document.querySelectorAll('.hero-glow').forEach((g, i) => {
+                        g.style.transform = `translateY(${s*(0.1+i*0.05)}px)`;
+                    }); ticking = false;
+                }); ticking = true;
+            }
+        });
+
+        // SMOOTH SCROLL (desktop)
+        (function() {
+            if ('ontouchstart' in window) return;
+            let target = window.pageYOffset, current = window.pageYOffset, running = false;
+            window.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                target += e.deltaY * 0.6;
+                target = Math.max(0, Math.min(target, document.body.scrollHeight - window.innerHeight));
+                if (!running) { running = true; tick(); }
+            }, { passive: false });
+            function tick() {
+                current += (target - current) * 0.12;
+                if (Math.abs(target - current) < 0.5) { current = target; window.scrollTo(0, current); running = false; return; }
+                window.scrollTo(0, current); requestAnimationFrame(tick);
+            }
+        })();
+
+        // TOUCH SWIPE
+        let tsx = 0;
+        lightbox.addEventListener('touchstart', (e) => { tsx = e.changedTouches[0].screenX; }, { passive: true });
+        lightbox.addEventListener('touchend', (e) => {
+            const d = tsx - e.changedTouches[0].screenX;
+            if (Math.abs(d) > 50) navLB(d > 0 ? 1 : -1);
+        }, { passive: true });
+    </script>
+</body>
+</html>
